@@ -18,6 +18,9 @@ def print_help():
 
 def run():
     """основной рабочий цикл."""
+    print("\n***БАЗА ДАННЫХ***")
+    print_help()
+
     while True:
         metadata = load_metadata(METADATA_FILE)
 

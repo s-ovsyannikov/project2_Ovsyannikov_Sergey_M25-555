@@ -1,14 +1,1 @@
-{
-  "test": [
-    "ID:int",
-    "id:int",
-    "name:str",
-    "active:bool"
-  ],
-  "test2": [
-    "ID:int",
-    "number:int",
-    "description:str",
-    "active:bool"
-  ]
-}
+{}
