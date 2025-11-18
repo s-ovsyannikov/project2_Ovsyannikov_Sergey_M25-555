@@ -1,5 +1,4 @@
 from prettytable import PrettyTable
-
 from .utils import load_table_data, save_table_data
 
 SUPPORTED_TYPES = {'int', 'str', 'bool'}
@@ -74,7 +73,7 @@ def _parse_value(value_str, expected_type):
             raise ValueError(f'Некорректное булево значение: {value_str}')
     
     elif expected_type == 'str':
-        # Убираем кавычки если они есть
+        # очитска от кавычек если они есть
         if (value_str.startswith('"') and value_str.endswith('"')) or \
            (value_str.startswith("'") and value_str.endswith("'")):
             return value_str[1:-1]
@@ -88,7 +87,7 @@ def _convert_to_string(value):
     """
     if isinstance(value, bool):
         return str(value)
-    return value
+    return str(value)
 
 def insert(metadata, table_name, values):
     """
@@ -98,19 +97,19 @@ def insert(metadata, table_name, values):
         print(f'Ошибка: Таблица "{table_name}" не существует.')
         return None
 
-    # Загружаем текущие данные
+    # загрузка текущих данных
     table_data = load_table_data(table_name)
     
-    # Получаем схему таблицы (без ID)
+    # схема таблицы без ID
     columns_schema = metadata[table_name]
-    data_columns = columns_schema[1:]  # исключаем ID
+    data_columns = columns_schema[1:]  
     
-    # Проверяем количество значений
+    # кол-во значений
     if len(values) != len(data_columns):
         print(f'Ошибка: Ожидается {len(data_columns)} значений, получено {len(values)}')
         return None
     
-    # Парсим значения согласно типам
+    # парсинг значений
     parsed_values = []
     for i, value in enumerate(values):
         col_name, col_type = data_columns[i].split(':')
@@ -121,49 +120,35 @@ def insert(metadata, table_name, values):
             print(f'Ошибка в значении "{value}" для столбца "{col_name}": {e}')
             return None
     
-    # Генерируем ID
+    # создание ID
     new_id = 1
     if table_data:
         ids = [record['ID'] for record in table_data]
         new_id = max(ids) + 1
     
-    # Создаем запись
+    # создание записи
     record = {'ID': new_id}
     for i, col in enumerate(data_columns):
         col_name = col.split(':')[0]
         record[col_name] = parsed_values[i]
     
-    # Добавляем запись
+    # добавление запись
     table_data.append(record)
     save_table_data(table_name, table_data)
     
     print(f'Запись с ID={new_id} успешно добавлена в таблицу "{table_name}".')
     return table_data
 
-def _parse_where_clause(where_str):
+def _parse_condition(condition_str):
     """
-    парсинг условия WHERE (более гибкий)
+    парсинг условия (упрощенный)
     """
-    # Поддерживаем разные форматы: "age = 19", "age=19", "name = 'Natalia'"
-    if '=' in where_str:
-        parts = where_str.split('=', 1)
+    if '=' in condition_str:
+        parts = condition_str.split('=', 1)
         column = parts[0].strip()
         value = parts[1].strip()
-        return {'column': column, 'value': value}
-    
-    return None
-
-def _parse_set_clause(set_str):
-    """
-    парсинг условия SET (более гибкий)
-    """
-    if '=' in set_str:
-        parts = set_str.split('=', 1)
-        column = parts[0].strip()
-        value = parts[1].strip()
-        return {'column': column, 'value': value}
-    
-    return None
+        return column, value
+    return None, None
 
 def select(metadata, table_name, where_clause=None):
     """
@@ -179,19 +164,16 @@ def select(metadata, table_name, where_clause=None):
         print(f'Таблица "{table_name}" пуста.')
         return
     
-    # Фильтруем данные если есть условие
+    # фильтрация
     filtered_data = table_data
     if where_clause:
-        where_parsed = _parse_where_clause(where_clause)
-        if not where_parsed:
+        column, value = _parse_condition(where_clause)
+        if not column:
             print('Некорректное условие WHERE.')
             return
         
-        column = where_parsed['column']
-        value = where_parsed['value']
-        
-        # Определяем тип столбца для парсинга значения
-        col_type = 'str'  # по умолчанию
+        # тип столбца для парсинга значения
+        col_type = 'str'  
         for col_schema in metadata[table_name]:
             col_name, col_type_str = col_schema.split(':')
             if col_name == column:
@@ -211,7 +193,7 @@ def select(metadata, table_name, where_clause=None):
         print('Записи не найдены.')
         return
     
-    # Создаем красивую таблицу для вывода
+    # таблицу для вывода
     table = PrettyTable()
     table.field_names = [col.split(':')[0] for col in metadata[table_name]]
     
@@ -238,44 +220,44 @@ def update(metadata, table_name, set_clause, where_clause):
         print(f'Таблица "{table_name}" пуста.')
         return None
     
-    # Парсим условия
-    set_parsed = _parse_set_clause(set_clause)
-    where_parsed = _parse_where_clause(where_clause)
+    # парсинг условий
+    set_column, set_value = _parse_condition(set_clause)
+    where_column, where_value = _parse_condition(where_clause)
     
-    if not set_parsed or not where_parsed:
+    if not set_column or not where_column:
         print('Некорректный формат SET или WHERE условия.')
         return None
     
-    # Определяем тип для SET значения
+    # определение типа для SET значения
     set_col_type = 'str'
     for col_schema in metadata[table_name]:
         col_name, col_type_str = col_schema.split(':')
-        if col_name == set_parsed['column']:
+        if col_name == set_column:
             set_col_type = col_type_str
             break
     
-    # Определяем тип для WHERE значения
+    # определение типа для WHERE значения
     where_col_type = 'str'
     for col_schema in metadata[table_name]:
         col_name, col_type_str = col_schema.split(':')
-        if col_name == where_parsed['column']:
+        if col_name == where_column:
             where_col_type = col_type_str
             break
     
     try:
-        set_value = _parse_value(set_parsed['value'], set_col_type)
-        where_value = _parse_value(where_parsed['value'], where_col_type)
+        parsed_set_value = _parse_value(set_value, set_col_type)
+        parsed_where_value = _parse_value(where_value, where_col_type)
     except ValueError as e:
         print(f'Ошибка в значении: {e}')
         return None
     
-    # Находим и обновляем записи
+    # поиск и обновление записи
     updated_count = 0
     updated_ids = []
     
     for record in table_data:
-        if str(record.get(where_parsed['column'], '')) == str(where_value):
-            record[set_parsed['column']] = set_value
+        if str(record.get(where_column, '')) == str(parsed_where_value):
+            record[set_column] = parsed_set_value
             updated_count += 1
             updated_ids.append(record['ID'])
     
@@ -291,8 +273,6 @@ def delete(metadata, table_name, where_clause):
     """
     удаление данных из таблицы
     """
-    print(f"DEBUG: table_name={table_name}, where_clause='{where_clause}'")
-    
     if table_name not in metadata:
         print(f'Ошибка: Таблица "{table_name}" не существует.')
         return None
@@ -303,31 +283,31 @@ def delete(metadata, table_name, where_clause):
         print(f'Таблица "{table_name}" пуста.')
         return None
     
-    where_parsed = _parse_where_clause(where_clause)
-    if not where_parsed:
+    where_column, where_value = _parse_condition(where_clause)
+    if not where_column:
         print('Некорректное условие WHERE.')
         return None
     
-    # Определяем тип для WHERE значения
+    # определение типа для WHERE значения
     where_col_type = 'str'
     for col_schema in metadata[table_name]:
         col_name, col_type_str = col_schema.split(':')
-        if col_name == where_parsed['column']:
+        if col_name == where_column:
             where_col_type = col_type_str
             break
     
     try:
-        where_value = _parse_value(where_parsed['value'], where_col_type)
+        parsed_where_value = _parse_value(where_value, where_col_type)
     except ValueError as e:
         print(f'Ошибка в условии WHERE: {e}')
         return None
     
-    # Находим записи для удаления
+    # поиск записи для удаления
     records_to_keep = []
     deleted_ids = []
     
     for record in table_data:
-        if str(record.get(where_parsed['column'], '')) == str(where_value):
+        if str(record.get(where_column, '')) == str(parsed_where_value):
             deleted_ids.append(record['ID'])
         else:
             records_to_keep.append(record)

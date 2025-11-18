@@ -54,7 +54,7 @@ def parse_set(set_str):
 def parse_values(values_str):
     """
     вставка значений, приобразование в список значений
-    удаление скобок, отделяет значения через запятую, 
+    удаление скобок, отделение значений через запятую
     """
     values_str = values_str.strip()
     if not (values_str.startswith('(') and values_str.endswith(')')):
@@ -64,7 +64,7 @@ def parse_values(values_str):
     if not values_str:
         return []
     
-    # Разбиваем по запятым, но учитываем кавычки
+    # разбивка по запятым 
     import shlex
     lexer = shlex.shlex(values_str, posix=True)
     lexer.whitespace = ','

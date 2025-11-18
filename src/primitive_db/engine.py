@@ -1,9 +1,8 @@
 import shlex
 
-from .core import create_table, delete, drop_table, info, insert, list_tables, select, update
+from .core import (create_table, drop_table, list_tables, insert, 
+                   select, update, delete, info)
 from .utils import load_metadata, save_metadata
-
-METADATA_FILE = 'db_meta.json'
 
 def print_help():
     """справочная информация"""
@@ -19,12 +18,12 @@ def print_help():
     print("<command> help - справочная информация\n")
 
 def run():
-    """основной рабочий цикл."""
+    """основной рабочий цикл"""
     print("\n***БАЗА ДАННЫХ***")
     print_help()
 
     while True:
-        metadata = load_metadata(METADATA_FILE)
+        metadata = load_metadata()  
 
         try:
             user_input = input('>>> Введите команду: ').strip()
@@ -42,7 +41,7 @@ def run():
                 columns = args[2:]
                 result = create_table(metadata, table_name, columns)
                 if result is not None:
-                    save_metadata(METADATA_FILE, result)
+                    save_metadata(result)  
 
             elif command == 'drop_table':
                 if len(args) != 2:
@@ -51,7 +50,7 @@ def run():
                 table_name = args[1]
                 result = drop_table(metadata, table_name)
                 if result is not None:
-                    save_metadata(METADATA_FILE, result)
+                    save_metadata(result)
 
             elif command == 'list_tables':
                 list_tables(metadata)
@@ -62,17 +61,16 @@ def run():
                     continue
                 
                 table_name = args[2]
-                # Извлекаем значения из скобок
+                
                 values_str = ' '.join(args[4:])
                 if not values_str.startswith('(') or not values_str.endswith(')'):
                     print('Значения должны быть в скобках.')
                     continue
                 
-                values_str = values_str[1:-1]  # убираем скобки
+                values_str = values_str[1:-1]  
                 values = [v.strip() for v in values_str.split(',')]
                 
                 result = insert(metadata, table_name, values)
-                # Данные сохраняются внутри функции insert
 
             elif command == 'select':
                 if len(args) < 3 or args[1].lower() != 'from':
@@ -88,19 +86,21 @@ def run():
                     select(metadata, table_name)
 
             elif command == 'update':
-                if len(args) < 6:
+                if len(args) < 4:
                     print('Неверный формат. Используйте: update <таблица> set <столбец>=<значение> where <столбец>=<значение>')
                     continue
                 
-                # Ищем индексы ключевых слов
-                try:
-                    set_index = args.index('set')
-                    where_index = args.index('where')
-                except ValueError:
-                    print('Неверный формат. Используйте: update <таблица> set <столбец>=<значение> where <столбец>=<значение>')
-                    continue
+            
+                set_index = -1
+                where_index = -1
                 
-                if where_index <= set_index + 1 or where_index >= len(args) - 1:
+                for i, arg in enumerate(args):
+                    if arg.lower() == 'set':
+                        set_index = i
+                    elif arg.lower() == 'where':
+                        where_index = i
+                
+                if set_index == -1 or where_index == -1 or where_index <= set_index + 1:
                     print('Неверный формат. Используйте: update <таблица> set <столбец>=<значение> where <столбец>=<значение>')
                     continue
                 
@@ -111,15 +111,13 @@ def run():
                 result = update(metadata, table_name, set_clause, where_clause)
 
             elif command == 'delete':
-                if len(args) < 4 or args[1].lower() != 'from':
+                if len(args) < 4:
                     print('Неверный формат. Используйте: delete from <таблица> where <условие>')
                     continue
                 
-                table_name = args[2]
                 
-                # Ищем ключевое слово WHERE
                 where_index = -1
-                for i in range(3, len(args)):
+                for i in range(2, len(args)):
                     if args[i].lower() == 'where':
                         where_index = i
                         break
@@ -128,7 +126,9 @@ def run():
                     print('Неверный формат. Используйте: delete from <таблица> where <условие>')
                     continue
                 
+                table_name = args[2] if args[1].lower() == 'from' else args[1]
                 where_clause = ' '.join(args[where_index + 1:])
+                
                 result = delete(metadata, table_name, where_clause)
 
             elif command == 'info':
