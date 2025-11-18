@@ -1,6 +1,7 @@
 import json
 import os
 
+
 def load_metadata(filepath='db_meta.json'):
     """
     загрузка данных из json

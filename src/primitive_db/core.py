@@ -1,4 +1,5 @@
 from prettytable import PrettyTable
+
 from .utils import load_table_data, save_table_data
 
 SUPPORTED_TYPES = {'int', 'str', 'bool'}

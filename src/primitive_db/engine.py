@@ -1,13 +1,16 @@
 import shlex
 
-from .core import (create_table, drop_table, list_tables, insert, 
-                   select, update, delete, info)
+from .core import create_table, delete, drop_table, info, insert, list_tables, select, update
 from .utils import load_metadata, save_metadata
+
 
 def print_help():
     """справочная информация"""
     print("\n***Операции с данными***")
     print("Функции:")
+    print("<command> create_table <имя_таблицы> <столбец1:тип> <столбец2:тип> ... - создать таблицу")
+    print("<command> list_tables - показать список всех таблиц")
+    print("<command> drop_table <имя_таблицы> - удалить таблицу")
     print("<command> insert into <имя_таблицы> values (<значение1>, <значение2>, ...) - создать запись.")
     print("<command> select from <имя_таблицы> where <столбец> = <значение> - прочитать записи по условию.")
     print("<command> select from <имя_таблицы> - прочитать все записи.")

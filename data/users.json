@@ -8,19 +8,13 @@
   {
     "ID": 2,
     "name": "Natalia",
-    "age": 19,
+    "age": 20,
     "is_active": true
   },
   {
     "ID": 3,
     "name": "Fedor",
     "age": 9,
-    "is_active": false
-  },
-  {
-    "ID": 4,
-    "name": "Luna",
-    "age": 3,
     "is_active": false
   }
 ]
