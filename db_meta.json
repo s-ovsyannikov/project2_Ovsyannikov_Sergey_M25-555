@@ -1,1 +1,14 @@
-{}
+{
+  "users": [
+    "ID:int",
+    "name:str",
+    "age:int",
+    "is_active:bool"
+  ],
+  "user3": [
+    "ID:int",
+    "name:str",
+    "age:int",
+    "is_active:bool"
+  ]
+}
