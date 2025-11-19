@@ -17,8 +17,6 @@
 
 ### Пример использования (управление таблицами)
 
-https://asciinema.org/a/HVgD9AI6ztIf23bbWcQzhet72
-
 [![asciicast](https://asciinema.org/a/HVgD9AI6ztIf23bbWcQzhet72.svg)](https://asciinema.org/a/HVgD9AI6ztIf23bbWcQzhet72)
 
 ## CRUD-операции
@@ -33,7 +31,7 @@ https://asciinema.org/a/HVgD9AI6ztIf23bbWcQzhet72
 
 ### Пример использования (CRUD-операции)
 
-https://asciinema.org/a/HpfIXJWli5e2VAa6oV5rIRByU
+[![asciicast](https://asciinema.org/a/HpfIXJWli5e2VAa6oV5rIRByU.svg)](https://asciinema.org/a/HpfIXJWli5e2VAa6oV5rIRByU)
 
 ### Форматы команд
 ```bash
@@ -91,4 +89,33 @@ delete from users where name = "John"
  - decorators.py - система декораторов
 
 ## Пример использования (весь функционал)
+
+[![asciicast](https://asciinema.org/a/0JNeM3yhs64byXvZ2tMwjVqup.svg)](https://asciinema.org/a/0JNeM3yhs64byXvZ2tMwjVqup)
+
+## ## Установка и запуск
+
+### Установка
+```bash
+# Через poetry 
+poetry install
+
+# Через make
+make install 
+```
+### Запуск
+```bash
+# Через poetry
+run poetry project
+
+# Через make 
+make project 
+```
+Убедитесь, что у вас установлены:
+Python 3.12
+Poetry и/или make
+
+### Автор
+
+Ovsyannikov Sergey
+Email: [s.ovsyannikov@gmail.com]
 
