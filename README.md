@@ -32,7 +32,7 @@ https://asciinema.org/a/HVgD9AI6ztIf23bbWcQzhet72
 
 ### Пример использования (CRUD-операции)
 
-https://asciinema.org/a/
+https://asciinema.org/a/HpfIXJWli5e2VAa6oV5rIRByU
 
 ### Форматы команд
 ```bash
