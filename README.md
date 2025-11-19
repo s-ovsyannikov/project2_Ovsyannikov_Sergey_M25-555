@@ -19,6 +19,7 @@
 
 https://asciinema.org/a/HVgD9AI6ztIf23bbWcQzhet72
 
+[![asciicast](https://asciinema.org/a/HVgD9AI6ztIf23bbWcQzhet72.svg)](https://asciinema.org/a/HVgD9AI6ztIf23bbWcQzhet72)
 
 ## CRUD-операции
 
@@ -88,4 +89,6 @@ delete from users where name = "John"
  - utils.py - вспомогательные функции для работы с файлами
  - parser.py - парсинг условий и вводимых выражений
  - decorators.py - система декораторов
+
+## Пример использования (весь функционал)
 
